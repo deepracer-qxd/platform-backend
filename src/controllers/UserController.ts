@@ -3,6 +3,7 @@ import {userRepository} from "../repositories/userRepository";
 import {BadRequestError, UnauthorizedError} from "../helpers/api-errors";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import {ROLE} from "../entities/Role";
 
 export class UserController {
     async create(req: Request, res: Response){
@@ -17,7 +18,8 @@ export class UserController {
         const newUser = userRepository.create({
             name,
             email,
-            password: passwordHash
+            password: passwordHash,
+            role: ROLE.BASIC
         })
 
         await userRepository.save(newUser)

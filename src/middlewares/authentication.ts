@@ -7,7 +7,7 @@ type JwtPayload = {
     id: number
 }
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers
 
     if(!authorization) throw new UnauthorizedError("The token was not sent")
