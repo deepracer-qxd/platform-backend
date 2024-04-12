@@ -1,8 +1,43 @@
+import { BucketItem, BucketStream } from "minio"
 import { MinioNotInitializedError } from "../../helpers/api-errors"
 import MinioClientAdmin from "./MinioClientAdmin"
 
 const minioInstance = MinioClientAdmin.getInstance()
 const minioClient = minioInstance.getClient()
+
+export async function getObject(bucketName: string, objectName: string): Promise<string>{
+  try {
+    checkIfBucketExists(bucketName)
+    return new Promise<string>((resolve, reject) => {
+        minioClient.getObject(bucketName, objectName, (error, obj) => {
+            if (error) {
+                reject(`Error fetching object ${error}`);
+            } else {
+                obj.on('data', function(obj){console.log(obj)})
+                resolve(`object ${obj}`);
+            }
+        });
+    });
+  }  catch (error) {
+    const errorMessage = error instanceof MinioNotInitializedError ? error.message : error;
+    return Promise.reject(`Error fetching object ${errorMessage}`);
+  }
+}
+
+export async function getBucketData(bucketName: string) {
+  try {
+    checkIfBucketExists(bucketName)
+    const stream = minioClient.listObjects(bucketName, "", true)
+    stream.on('data', function(obj){ 
+      console.log(obj)
+      })
+  } catch (error) {
+    const errorMessage = error instanceof MinioNotInitializedError ? error.message : error;
+    return {
+      error: `Error creating bucket '${bucketName}': ${errorMessage}`
+    };
+  }
+}
 
 export async function getUserPolicy(bucketName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {

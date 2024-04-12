@@ -14,6 +14,8 @@ routes.use(authenticationMiddleware)
 routes.get('/profile', new UserController().getProfile)
 routes.post('/minio', new MinioController().createBucket)
 routes.get('/minio/policy', new MinioController().getUserPolicy)
+routes.get('/minio/bucket/files', new MinioController().getBucketData)
+routes.get('/minio/bucket/object', new MinioController().getObjectByBucket)
 
 
 // Admin routes
