@@ -12,11 +12,21 @@
 				{
 					"name": "create",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bodyToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Joaozin\",\n    \"email\": \"jvcarvoli@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"raw": "{\n    \"name\": \"Joaozin 1\",\n    \"email\": \"jvcarvoli@gmail.com\",\n    \"password\": \"123456\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -37,6 +47,30 @@
 				},
 				{
 					"name": "login",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"var bodyToken = responseJson.access_token;",
+									"pm.environment.set(\"bodyToken\", bodyToken)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -69,7 +103,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzEyNDQwMjc3LCJleHAiOjE3MTI0NjkwNzd9.w7po2HSFpI4t2rBEItID6fyOmbqPj-1B674B6mf0qug",
+									"value": "{{bodyToken}}",
 									"type": "string"
 								}
 							]
@@ -83,6 +117,116 @@
 							],
 							"path": [
 								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bodyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/user/delete/2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"delete",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "minio",
+			"item": [
+				{
+					"name": "create bucket",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bodyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bucketName\": \"joao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/minio",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"minio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get bucket policies",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bodyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bucketName\": \"joao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/minio/policy",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"minio",
+								"policy"
 							]
 						}
 					},
