@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import {ROLE} from "../entities/Role";
 
 export class UserController {
+
     async create(req: Request, res: Response){
         const { name, email, password } = req.body
 
@@ -39,7 +40,7 @@ export class UserController {
 
         if(!verifyPass) throw new BadRequestError(`Invalid email or password`)
 
-        const token = jwt.sign({id: user.id},
+        const access_token = jwt.sign({id: user.id},
             process.env.JWT_PASS ?? '',
             {expiresIn: '8h'})
 
@@ -47,8 +48,15 @@ export class UserController {
 
         return res.status(200).json({
             user: userLogin,
-            token
+            access_token
         })
+    }
+
+    async delete(req: Request, res: Response){
+        const { userId } = req.params
+        const result = await userRepository.delete(userId)
+        const message = result.affected == 1 ? `User with id ${userId} was deleted` : `User with id ${userId} was not deleted`
+        return res.status(200).json({message})
     }
 
     async getProfile(req: Request, res: Response){
