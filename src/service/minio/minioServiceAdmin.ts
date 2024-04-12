@@ -17,24 +17,35 @@ export async function getUserPolicy(bucketName: string): Promise<string> {
 }
 
 export async function createBucket(bucketName: string) {
-  const bucketExists = await checkIfBucketExists(bucketName)
-  if (bucketExists) {
+  try {
+    const bucketExists = await checkIfBucketExists(bucketName);
+    if (bucketExists) {
       return {
-          message: 'Bucket ' + bucketName + ' exists.'
+        message: `Bucket '${bucketName}' already exists.`
       };
-  } else {
+    } else {
       await minioClient.makeBucket(bucketName, 'us-east-1');
       return {
-          message: 'Bucket ' + bucketName + ' created in "us-east-1".'
+        message: `Bucket '${bucketName}' created in "us-east-1".`
       };
+    }
+  } catch (error) {
+    const errorMessage = error instanceof MinioNotInitializedError ? error.message : error;
+    return {
+      error: `Error creating bucket '${bucketName}': ${errorMessage}`
+    };
   }
 }
 
-const checkIfBucketExists = async (bucketName: string) => {
-    try {
-        if (minioClient === null) throw new MinioNotInitializedError('Minio client not initialized');
-        return await minioClient.bucketExists(bucketName);
-    } catch (e) {
-        return e
-    }
+
+async function checkIfBucketExists(bucketName: string): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+    minioClient.bucketExists(bucketName, (error, exists) => {
+      if (error) {
+        reject(new MinioNotInitializedError('Minio client not initialized'));
+      } else {
+        resolve(exists);
+      }
+    });
+  })
 }

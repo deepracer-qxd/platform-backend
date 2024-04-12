@@ -11,12 +11,10 @@ export class MinioController {
     async getUserPolicy(req: Request, res: Response){
         try {
             const { bucketName } = req.body
-            const bucketPolicy = await getUserPolicy(bucketName)
-            return res.status(200).json(bucketPolicy)
-        } catch (e){
-            return res.status(500).json({
-                error: e
-            })
+            const policy = await getUserPolicy(bucketName)
+            return res.status(200).json({policy})
+        } catch (error){
+            return res.status(500).json({error})
         }
     }
 }
